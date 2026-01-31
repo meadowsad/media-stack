@@ -1,0 +1,14 @@
+[Unit]
+Description=NAS Media NFS Mount
+Requires=network-online.target
+After=network-online.target
+Before=docker.service
+
+[Mount]
+What=10.0.4.151:/mnt/Default_Pool/Media
+Where=/storage/data/nas/media
+Type=nfs
+Options=rw,hard,nofail,_netdev,rsize=1048576,wsize=1048576,timeo=14,retrans=2
+
+[Install]
+WantedBy=multi-user.target
