@@ -1,6 +1,6 @@
 # Media Automation Stack
 
-A complete Docker-based media automation system for downloading, organizing, and streaming TV shows and movies using Usenet.
+A complete Docker-based media automation system for downloading, organizing, and streaming TV shows and movies using Usenet. **Fully configured for automatic startup on boot.**
 
 ## Stack Components
 
@@ -16,7 +16,7 @@ A complete Docker-based media automation system for downloading, organizing, and
 - ✅ Proper file organization and renaming
 - ✅ Universal streaming via Jellyfin
 - ✅ Works with Kodi, web browsers, and mobile apps
-- ✅ Docker-based for easy deployment and updates
+- ✅ **Auto-starts on system boot** with correct service ordering
 
 ## Architecture
 
@@ -41,6 +41,14 @@ A complete Docker-based media automation system for downloading, organizing, and
 │ 5. Jellyfin serves content from NAS to all devices          │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+## Boot Sequence (Automatic)
+
+```
+System Boot → Network Ready → NFS Mount → Docker Service → All Containers
+```
+
+The system is configured to start everything in the correct order automatically. See [BOOT_CONFIGURATION.md](docs/BOOT_CONFIGURATION.md) for details.
 
 ## Prerequisites
 
@@ -110,11 +118,16 @@ sudo chown -R $USER:$USER /storage/data/local/downloads
 
 ### 5. Configure Docker to wait for NFS
 
+**This step is critical for auto-start on boot:**
+
 ```bash
 # Ensure Docker starts after NFS mount
 sudo mkdir -p /etc/systemd/system/docker.service.d
 sudo cp systemd/docker-wait-for-nfs.conf /etc/systemd/system/docker.service.d/wait-for-nfs.conf
 sudo systemctl daemon-reload
+
+# Enable Docker to start on boot
+sudo systemctl enable docker
 ```
 
 ### 6. Start the stack
@@ -123,7 +136,16 @@ sudo systemctl daemon-reload
 docker-compose up -d
 ```
 
-### 7. Access the web interfaces
+### 7. Verify boot configuration
+
+```bash
+# Run the verification script
+./scripts/verify-boot-config.sh
+```
+
+This checks that everything is properly configured to auto-start.
+
+### 8. Access the web interfaces
 
 - **SABnzbd:** http://your-server-ip:8080
 - **Sonarr:** http://your-server-ip:8989
@@ -132,57 +154,7 @@ docker-compose up -d
 
 ## Configuration Guide
 
-### SABnzbd Setup
-
-1. Complete the initial setup wizard
-2. Add your Usenet provider
-3. **Folders:**
-   - Temporary Download Folder: `/incomplete-downloads`
-   - Completed Download Folder: `/downloads/complete`
-4. **Categories:**
-   - Create `tv` category (folder: `tv`)
-   - Create `movies` category (folder: `movies`)
-5. Copy the API Key from Config → General
-
-### Sonarr Setup
-
-1. **Settings → Media Management:**
-   - Enable "Rename Episodes"
-   - Add Root Folder: `/tv`
-2. **Settings → Download Clients:**
-   - Add SABnzbd
-   - Host: `sabnzbd`
-   - Port: `8080`
-   - API Key: (from SABnzbd)
-   - Category: `tv`
-3. **Remote Path Mappings:**
-   - Host: `sabnzbd`
-   - Remote Path: `/downloads/complete/`
-   - Local Path: `/downloads/complete/`
-
-### Radarr Setup
-
-1. **Settings → Media Management:**
-   - Enable "Rename Movies"
-   - Add Root Folder: `/movies`
-2. **Settings → Download Clients:**
-   - Add SABnzbd
-   - Host: `sabnzbd`
-   - Port: `8080`
-   - API Key: (from SABnzbd)
-   - Category: `movies`
-3. **Remote Path Mappings:**
-   - Host: `sabnzbd`
-   - Remote Path: `/downloads/complete/`
-   - Local Path: `/downloads/complete/`
-
-### Jellyfin Setup
-
-1. Complete the initial setup wizard
-2. **Add Media Libraries:**
-   - **TV Shows:** Content type: Shows, Folder: `/data/tv`
-   - **Movies:** Content type: Movies, Folder: `/data/movies`
-3. Scan libraries to detect existing content
+See [INSTALL.md](INSTALL.md) for detailed setup instructions for each service.
 
 ## Directory Structure
 
@@ -208,12 +180,39 @@ docker-compose up -d
 └── jellyfin/                    # Jellyfin config (auto-created)
 ```
 
+## Automatic Startup
+
+The system is configured to start automatically on boot with proper service ordering:
+
+1. **NFS mount** activates when network is ready
+2. **Docker service** waits for NFS before starting  
+3. **All containers** auto-start with `restart: unless-stopped`
+
+**To verify auto-start configuration:**
+```bash
+./scripts/verify-boot-config.sh
+```
+
+**To test:**
+```bash
+sudo reboot
+# Wait 1-2 minutes, then check:
+docker-compose ps
+```
+
+See [BOOT_CONFIGURATION.md](docs/BOOT_CONFIGURATION.md) for complete details.
+
 ## Maintenance
 
 ### Update containers
 
 ```bash
 cd /opt/media-stack
+./scripts/update.sh
+```
+
+Or manually:
+```bash
 docker-compose pull
 docker-compose up -d
 ```
@@ -237,6 +236,11 @@ docker-compose restart sabnzbd
 ### Backup configuration
 
 ```bash
+./scripts/backup.sh
+```
+
+Or manually:
+```bash
 cd /opt/media-stack
 tar -czf ~/media-stack-backup-$(date +%Y%m%d).tar.gz \
   sabnzbd/ sonarr/ radarr/ jellyfin/ docker-compose.yml .env
@@ -253,43 +257,38 @@ docker-compose up -d
 
 ## Troubleshooting
 
-### NFS mount not working
+### Services don't start after reboot
 
 ```bash
-# Check mount status
+# Check boot configuration
+./scripts/verify-boot-config.sh
+
+# Check NFS mount
 systemctl status storage-data-nas-media.mount
 
-# Check if mounted
-mount | grep media
+# Check Docker service
+sudo systemctl status docker
 
-# Restart mount
-sudo systemctl restart storage-data-nas-media.mount
-```
-
-### Containers can't see NFS files
-
-```bash
-# Ensure Docker waits for NFS
-sudo systemctl daemon-reload
-docker-compose down
-sudo systemctl restart docker
+# Manually start if needed
 docker-compose up -d
 ```
 
-### Permission errors
+For more issues, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
-```bash
-# Fix local download directory permissions
-sudo chown -R 1000:1000 /storage/data/local/downloads
-sudo chmod -R 755 /storage/data/local/downloads
-```
+## Documentation
 
-### Sonarr/Radarr can't import files
+- **[INSTALL.md](INSTALL.md)** - Detailed installation guide
+- **[docs/BOOT_CONFIGURATION.md](docs/BOOT_CONFIGURATION.md)** - Boot and auto-start configuration
+- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - Problem solving
+- **[docs/CONFIGURATION_EXAMPLES.md](docs/CONFIGURATION_EXAMPLES.md)** - Advanced configurations
+- **[GITHUB_GUIDE.md](GITHUB_GUIDE.md)** - Using this repo with GitHub
 
-1. Check Remote Path Mappings are configured correctly
-2. Verify download client connection
-3. Check System → Status for warnings
-4. Try Manual Import from Activity → Queue
+## Scripts
+
+- **`scripts/setup-directories.sh`** - Create required directory structure
+- **`scripts/backup.sh`** - Backup all configurations
+- **`scripts/update.sh`** - Update all containers
+- **`scripts/verify-boot-config.sh`** - Verify auto-start configuration
 
 ## Security Notes
 
