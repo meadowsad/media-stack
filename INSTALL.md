@@ -82,7 +82,7 @@ Update these values in `.env`:
 PUID=1000          # Your UID from 'id' command
 PGID=1000          # Your GID from 'id' command
 TZ=America/New_York  # Your timezone
-NAS_IP=10.0.4.151    # Your NAS IP address
+NAS_IP=your_nas_ip    # Your NAS IP address
 NAS_SHARE_PATH=/mnt/Default_Pool/Media  # Your NFS share path
 ```
 
@@ -97,7 +97,7 @@ nano systemd/storage-data-nas-media.mount
 
 Update the `What=` line with your NAS IP and share path:
 ```ini
-What=YOUR_NAS_IP:/your/nfs/share/path
+What=your_nas_ip:/your/nfs/share/path
 ```
 
 Save and exit.
@@ -170,12 +170,12 @@ You should see all four containers (sabnzbd, sonarr, radarr, jellyfin) in "Up" s
 ### 9. Access Web Interfaces
 
 Open a web browser and navigate to:
-- **SABnzbd:** http://YOUR_SERVER_IP:8080
-- **Sonarr:** http://YOUR_SERVER_IP:8989
-- **Radarr:** http://YOUR_SERVER_IP:7878
-- **Jellyfin:** http://YOUR_SERVER_IP:8096
+- **SABnzbd:** http://your_server_ip:8080
+- **Sonarr:** http://your_server_ip:8989
+- **Radarr:** http://your_server_ip:7878
+- **Jellyfin:** http://your_server_ip:8096
 
-Replace `YOUR_SERVER_IP` with your server's IP address (run `ip a` to find it).
+Replace `your_server_ip` with your server's IP address (run `ip a` to find it).
 
 ### 10. Configure SABnzbd
 
