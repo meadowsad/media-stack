@@ -5,7 +5,7 @@ After=network-online.target
 Before=docker.service
 
 [Mount]
-What=YOUR_NAS_IP:/mnt/Default_Pool/Media
+What=your_nas_ip:/mnt/Default_Pool/Media
 Where=/storage/data/nas/media
 Type=nfs
 Options=rw,hard,nofail,_netdev,rsize=1048576,wsize=1048576,timeo=14,retrans=2
