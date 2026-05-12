@@ -248,10 +248,6 @@ See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for detailed problem solv
 
 **Kodi:** Install "Jellyfin for Kodi" from the Kodi repository.
 
-## License
-
-MIT License — see LICENSE file for details.
-
 ## Acknowledgments
 
 - [LinuxServer.io](https://www.linuxserver.io/) for excellent Docker images
