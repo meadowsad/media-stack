@@ -20,7 +20,7 @@ systemctl status storage-data-nas-media.mount
 journalctl -u storage-data-nas-media.mount -n 50
 
 # Try manual mount to test
-sudo mount -t nfs 10.0.4.151:/mnt/Default_Pool/Media /storage/data/nas/media
+sudo mount -t nfs your_nas_ip:/mnt/Default_Pool/Media /storage/data/nas/media
 
 # If manual mount works, restart systemd mount
 sudo systemctl restart storage-data-nas-media.mount
