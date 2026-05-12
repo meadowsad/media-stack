@@ -1,6 +1,5 @@
-version: "3.8"
-
 services:
+
   sabnzbd:
     image: linuxserver/sabnzbd:latest
     container_name: sabnzbd
@@ -15,6 +14,8 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+    networks:
+      - media
 
   sonarr:
     image: linuxserver/sonarr:latest
@@ -32,6 +33,8 @@ services:
     restart: unless-stopped
     depends_on:
       - sabnzbd
+    networks:
+      - media
 
   radarr:
     image: linuxserver/radarr:latest
@@ -49,6 +52,8 @@ services:
     restart: unless-stopped
     depends_on:
       - sabnzbd
+    networks:
+      - media
 
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -65,3 +70,11 @@ services:
     ports:
       - "8096:8096"
     restart: unless-stopped
+    networks:
+      - media-readonly
+
+networks:
+  media:
+    driver: bridge
+  media-readonly:
+    driver: bridge
