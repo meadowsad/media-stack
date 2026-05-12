@@ -114,7 +114,7 @@ The `.gitignore` is configured to prevent committing:
 ### What to Customize Before Committing
 
 1. **systemd/storage-data-nas-media.mount**
-   - Replace `10.0.4.151:/mnt/Default_Pool/Media` with YOUR_NAS_IP:/your/path
+   - Replace `your_nas_ip:/mnt/Default_Pool/Media` with your_nas_ip:/your/path
    - Or use placeholders and document in README
 
 2. **.env.example**
