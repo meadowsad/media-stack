@@ -13,7 +13,7 @@ After=network-online.target
 Before=docker.service
 
 [Mount]
-What=10.0.4.151:/mnt/Default_Pool/Media
+What=your_nas_ip:/mnt/Default_Pool/Media
 Where=/storage/data/nas/media
 Type=nfs
 Options=rw,hard,nofail,_netdev,vers=4,rsize=1048576,wsize=1048576
@@ -25,7 +25,7 @@ WantedBy=multi-user.target
 ### Mount with Authentication
 ```ini
 [Mount]
-What=10.0.4.151:/mnt/Default_Pool/Media
+What=your_nas_ip:/mnt/Default_Pool/Media
 Where=/storage/data/nas/media
 Type=nfs
 Options=rw,hard,nofail,_netdev,rsize=1048576,wsize=1048576,sec=sys,timeo=14
@@ -37,7 +37,7 @@ WantedBy=multi-user.target
 ### Soft Mount (for unstable networks)
 ```ini
 [Mount]
-What=10.0.4.151:/mnt/Default_Pool/Media
+What=your_nas_ip:/mnt/Default_Pool/Media
 Where=/storage/data/nas/media
 Type=nfs
 Options=rw,soft,nofail,_netdev,rsize=1048576,wsize=1048576,timeo=30,retrans=3
@@ -137,7 +137,7 @@ PGID=1000
 TZ=America/New_York
 
 # NAS Configuration
-NAS_IP=10.0.4.151
+NAS_IP=your_nas_ip
 NAS_SHARE_PATH=/mnt/Default_Pool/Media
 
 # Port Configuration (optional)
@@ -269,10 +269,10 @@ crontab -e
 ### UFW (Ubuntu)
 ```bash
 # Allow only from local network
-sudo ufw allow from 192.168.1.0/24 to any port 8080 proto tcp
-sudo ufw allow from 192.168.1.0/24 to any port 8989 proto tcp
-sudo ufw allow from 192.168.1.0/24 to any port 7878 proto tcp
-sudo ufw allow from 192.168.1.0/24 to any port 8096 proto tcp
+sudo ufw allow from allowed_subnet/24 to any port 8080 proto tcp
+sudo ufw allow from allowed_subnet/24 to any port 8989 proto tcp
+sudo ufw allow from allowed_subnet/24 to any port 7878 proto tcp
+sudo ufw allow from allowed_subnet/24 to any port 8096 proto tcp
 ```
 
 ### Firewalld (Fedora/RHEL)
