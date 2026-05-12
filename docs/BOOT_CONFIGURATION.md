@@ -123,10 +123,10 @@ cd /opt/media-stack
 docker-compose ps
 
 # Access web interfaces
-# http://your-ip:8080 (SABnzbd)
-# http://your-ip:8989 (Sonarr)
-# http://your-ip:7878 (Radarr)
-# http://your-ip:8096 (Jellyfin)
+# http://your_nas_ip:8080 (SABnzbd)
+# http://your_nas_ip:8989 (Sonarr)
+# http://your_nas_ip:7878 (Radarr)
+# http://your_nas_ip:8096 (Jellyfin)
 ```
 
 ## Boot Sequence Details
@@ -140,7 +140,7 @@ docker-compose ps
    ↓
 3. NFS Mount (storage-data-nas-media.mount)
    - Requires: network-online.target
-   - Mounts: 10.0.4.151:/path to /storage/data/nas/media
+   - Mounts: your_nas_ip:/path to /storage/data/nas/media
    ↓
 4. Docker Service (docker.service)
    - Requires: storage-data-nas-media.mount
